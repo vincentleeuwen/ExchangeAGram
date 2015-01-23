@@ -89,9 +89,15 @@ class FeedViewController: UIViewController, UICollectionViewDataSource, UICollec
         feedItem.caption = "Test Caption"
         
         (UIApplication.sharedApplication().delegate as AppDelegate).saveContext()
-            
-            
+        
+        feedArray.append(feedItem)
+        
         self.dismissViewControllerAnimated(true, completion: nil)
+        
+        // reload the data so we'll see the new image
+        self.collectionView.reloadData()
+        
+        
     }
     
     
