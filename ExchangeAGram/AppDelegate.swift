@@ -22,7 +22,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let cache = NSURLCache(memoryCapacity: 8 * 1024 * 1024, diskCapacity: 20 * 1024 * 1024, diskPath: nil)
         NSURLCache.setSharedURLCache(cache)
         
+        
+        // Code needed to enable Facebook SDK
+        FBLoginView.self
+        FBProfilePictureView.self
+        
+        
         return true
+    }
+    
+    // this allows the application to open again after the user has signed in succesfully
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool {
+        var wasHandled:Bool = FBAppCall.handleOpenURL(url, sourceApplication: sourceApplication)
+        return wasHandled
     }
     
     // automatically clear cache when you receive a memory warning

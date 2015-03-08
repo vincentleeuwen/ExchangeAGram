@@ -55,6 +55,8 @@ class FilterViewController: UIViewController, UICollectionViewDataSource, UIColl
         // Dispose of any resources that can be recreated.
     }
     
+    
+    
     // UICollectionViewDataSource
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -86,22 +88,44 @@ class FilterViewController: UIViewController, UICollectionViewDataSource, UIColl
     
     // UICollectionViewDelegate
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
         
-        let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
-        self.thisFeedItem.image = imageData
-        let thumbNailData = UIImageJPEGRepresentation(filterImage, 0.1)
-        self.thisFeedItem.thumbNail = thumbNailData
-        
-        // use the app delegate to save image to filesystem (4217)
-        (UIApplication.sharedApplication().delegate as AppDelegate).saveContext()
-        
-        self.navigationController?.popViewControllerAnimated(true)
+        createUIAlertController(indexPath)
         
     }
     
     
     // Helper functions
+    
+    func saveFilterToCoreData(indexPath: NSIndexPath, caption: String) {
+        let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
+        let imageData = UIImageJPEGRepresentation(filterImage, 1.0)
+        self.thisFeedItem.image = imageData
+        let thumbNailData = UIImageJPEGRepresentation(filterImage, 0.1)
+        self.thisFeedItem.thumbNail = thumbNailData
+        self.thisFeedItem.caption = caption
+        // use the app delegate to save image to filesystem (4217)
+        (UIApplication.sharedApplication().delegate as AppDelegate).saveContext()
+        
+        self.navigationController?.popViewControllerAnimated(true)
+
+    }
+    
+    func shareToFacebook(indexPath: NSIndexPath) {
+        let filterImage = self.filteredImageFromImage(self.thisFeedItem.image, filter: self.filters[indexPath.row])
+
+        let photos:NSArray = [filterImage]
+        var params = FBPhotoParams()
+        params.photos = photos
+        
+        FBDialogs.presentShareDialogWithPhotoParams(params, clientState: nil) { (call, result, error) -> Void in
+            if (result? != nil) {
+                println(result)
+            } else {
+                println(error)
+            }
+        }
+        
+    }
     
     
     // filters
@@ -166,6 +190,50 @@ class FilterViewController: UIViewController, UICollectionViewDataSource, UIColl
         return finalImage!
 
         
+    }
+    
+    // UIAlert controller helper functions
+    
+    func createUIAlertController(indexPath: NSIndexPath) {
+        let alert = UIAlertController(title: "Photo Options", message: "Please choose an option", preferredStyle: UIAlertControllerStyle.Alert)
+        
+        alert.addTextFieldWithConfigurationHandler { (textField) -> Void in
+            textField.placeholder = "Add Caption!"
+            textField.secureTextEntry = false
+            
+        }
+        
+
+        let textField = alert.textFields![0] as UITextField
+
+        
+        let photoAction = UIAlertAction (title: "Post photo to Facebook with caption", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
+            // post to facebook
+            self.shareToFacebook(indexPath)
+            
+            var text = textField.text
+            // save image
+            self.saveFilterToCoreData(indexPath, caption: text)
+            
+        }
+        
+        alert.addAction(photoAction)
+        
+        let saveFilterAction = UIAlertAction(title: "Save filter without posting on Facebook", style: UIAlertActionStyle.Default) { (UIAlertAction) -> Void in
+            // save image
+            var text = textField.text
+            self.saveFilterToCoreData(indexPath, caption: text)
+        }
+        
+        alert.addAction(saveFilterAction)
+        
+        let cancelAction = UIAlertAction(title: "Select another filter", style: UIAlertActionStyle.Cancel) { (UIAlertAction) -> Void in
+            // cancel
+        }
+        
+        alert.addAction(cancelAction)
+        
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
     

@@ -26,6 +26,27 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>FacebookAppID</key>
+	<string>1586443124906878</string>
+	<key>FacebookDisplayName</key>
+	<string>ExchangeAGram</string>
+	<key>NSLocationUsageDescription</key>
+	<string>ExchangeAGram Would like to use your location</string>
+	<key>NSLocationWhenInUsageDescription</key>
+	<string>ExchangeAGram Would like to use your location</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>ExchangeAGram Would like to use your location</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1586443124906878</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
